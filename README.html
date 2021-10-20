@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="David Johnson">
+  <meta name="dcterms.date" content="2021-10-20">
+  <title>GRIN</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js@^4//dist/reset.css">
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js@^4//dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #cccccc; background-color: #303030; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ffcfaf; } /* Alert */
+    code span.an { color: #7f9f7f; font-weight: bold; } /* Annotation */
+    code span.at { } /* Attribute */
+    code span.bn { color: #dca3a3; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #f0dfaf; } /* ControlFlow */
+    code span.ch { color: #dca3a3; } /* Char */
+    code span.cn { color: #dca3a3; font-weight: bold; } /* Constant */
+    code span.co { color: #7f9f7f; } /* Comment */
+    code span.cv { color: #7f9f7f; font-weight: bold; } /* CommentVar */
+    code span.do { color: #7f9f7f; } /* Documentation */
+    code span.dt { color: #dfdfbf; } /* DataType */
+    code span.dv { color: #dcdccc; } /* DecVal */
+    code span.er { color: #c3bf9f; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #c0bed1; } /* Float */
+    code span.fu { color: #efef8f; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #7f9f7f; font-weight: bold; } /* Information */
+    code span.kw { color: #f0dfaf; } /* Keyword */
+    code span.op { color: #f0efd0; } /* Operator */
+    code span.ot { color: #efef8f; } /* Other */
+    code span.pp { color: #ffcfaf; font-weight: bold; } /* Preprocessor */
+    code span.sc { color: #dca3a3; } /* SpecialChar */
+    code span.ss { color: #cc9393; } /* SpecialString */
+    code span.st { color: #cc9393; } /* String */
+    code span.va { } /* Variable */
+    code span.vs { color: #cc9393; } /* VerbatimString */
+    code span.wa { color: #7f9f7f; font-weight: bold; } /* Warning */
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js@^4//dist/theme/black.css" id="theme">
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">GRIN</h1>
+  <p class="author">David Johnson</p>
+  <p class="date">10/20/2021</p>
+</section>
+
+<section class="slide level1">
+
+<h3 id="graph-reduction-intermediate-notation">Graph Reduction Intermediate Notation</h3>
+<ul>
+<li>A strategy for the evaluation of lazy functional programs</li>
+</ul>
+</section>
+<section class="slide level1">
+
+<h3 id="example">Example</h3>
+<p><img data-src="https://user-images.githubusercontent.com/875324/138087456-d9392986-b2e9-4411-b195-47159ca51e3b.png" /></p>
+</section>
+<section class="slide level1">
+
+<h3 id="graph-reduction">Graph Reduction</h3>
+<p><img data-src="https://user-images.githubusercontent.com/875324/138077347-7da69a71-3611-48d2-a111-58f5255f2e3c.png" /></p>
+</section>
+<section class="slide level1">
+
+<h3 id="history">History</h3>
+<ul>
+<li>Research spans 70s-00s
+<ul>
+<li>Interpreters</li>
+<li>Compiled graph reduction</li>
+<li>G-machine (Thomas Johnsson)</li>
+<li>STG (SPJ / Marlow) - GHC’s current strategy</li>
+<li>GRIN (Thomas Johnnson)</li>
+<li>Reduceron (Hardware accelerated graph reduction)
+<ul>
+<li>https://github.com/tommythorn/Reduceron</li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level1">
+
+<h3 id="example-1">Example</h3>
+<p><img data-src="https://user-images.githubusercontent.com/875324/138076364-04b17e0c-1e17-4daf-a25d-e58baad0450e.png" /></p>
+</section>
+<section class="slide level1">
+
+<h3 id="another-example">Another example</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>                       f <span class="ot">=</span> \x <span class="ot">-&gt;</span> x <span class="op">+</span> x</span></code></pre></div>
+<p><img data-src="https://user-images.githubusercontent.com/875324/138079286-ada04e78-c8c5-4429-ae26-14c792aeae77.png" /></p>
+</section>
+<section class="slide level1">
+
+<h3 id="ghc-pipeline">GHC Pipeline</h3>
+<p><img data-src="https://user-images.githubusercontent.com/875324/138091797-b573c198-85ef-4a57-9d14-0b96df826ff0.png" /></p>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-pipeline">GRIN Pipeline</h3>
+<p><img width="400" src="https://user-images.githubusercontent.com/875324/138148070-afd337c6-c91a-4737-9749-95f3797a6204.png"/></p>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-vs.-stg">GRIN vs. STG</h3>
+<ul>
+<li>Evaluation of a suspended function application
+<ul>
+<li>STG: The function to call is unknown at compile time, the evaluation of a closure will result in some kind of indirect call, through a pointer. This makes optimisations harder.</li>
+<li>GRIN: forbids all unknown calls and uses control flow analysis to approximate the possible targets.</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-language">GRIN Language</h3>
+<ul>
+<li>First order
+<ul>
+<li>No HOFs, defunctionalized</li>
+</ul></li>
+<li>Strict
+<ul>
+<li>GRIN statements are evaluated strictly</li>
+<li>Lazy graph traversal is encoded implicitly via <code>eval</code></li>
+</ul></li>
+<li>State monadic
+<ul>
+<li><code>update</code> is like <code>modify'</code></li>
+<li><code>fetch</code> is like <code>get</code></li>
+<li><code>pure</code> is like <code>return</code></li>
+<li><code>(&lt;-)</code> is like <code>(&gt;&gt;=)</code></li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-language-cont.">GRIN Language cont.</h3>
+<ul>
+<li>SSA
+<ul>
+<li>Single static assignment (all names are unique)</li>
+</ul></li>
+<li>Whole program optimizing
+<ul>
+<li>Entire program available for optimization</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-ast">GRIN AST</h3>
+<p><img width="500" src="https://user-images.githubusercontent.com/875324/138086203-df054600-1799-42d6-a4fa-2194dac720e3.png"/></p>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-bnf">GRIN BNF</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">grin ::</span> { <span class="dt">Grin</span> }</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">:</span> many1(def) { <span class="dt">Grin</span> <span class="op">$</span><span class="dv">1</span> }</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>def</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">:</span> var many(var) <span class="ch">&#39;=&#39;</span> <span class="kw">do</span> <span class="fu">exp</span> { <span class="dt">Def</span> <span class="op">$</span><span class="dv">1</span> <span class="op">$</span><span class="dv">2</span> <span class="op">$</span><span class="dv">5</span> }</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="op">:</span> val &#39;<span class="ot">&lt;-</span>&#39; sexp <span class="ch">&#39;;&#39;</span> <span class="fu">exp</span> { <span class="dt">Bind</span> <span class="op">$</span><span class="dv">1</span> <span class="op">$</span><span class="dv">3</span> <span class="op">$</span><span class="dv">5</span> }</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> <span class="kw">case</span> val <span class="kw">of</span> <span class="ch">&#39;{&#39;</span> many1(cpat_exp) <span class="ch">&#39;}&#39;</span> { <span class="dt">Case</span> <span class="op">$</span><span class="dv">2</span> <span class="op">$</span><span class="dv">5</span> }</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> sexp <span class="ch">&#39;;&#39;</span> { <span class="dt">Op</span> <span class="op">$</span><span class="dv">1</span> }</span></code></pre></div>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-bnf-cont.">GRIN BNF cont.</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>sexp</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">:</span> var many1(val) { <span class="dt">App</span> <span class="op">$</span><span class="dv">1</span> <span class="op">$</span><span class="dv">2</span> }</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> <span class="fu">pure</span> val { <span class="dt">Pure</span> <span class="op">$</span><span class="dv">2</span> }</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> store val { <span class="dt">Store</span> <span class="op">$</span><span class="dv">2</span> }</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> fetch var <span class="ch">&#39;[&#39;</span> int <span class="ch">&#39;]&#39;</span> { <span class="dt">Fetch</span> <span class="op">$</span><span class="dv">2</span> (<span class="dt">Just</span> <span class="op">$</span><span class="dv">4</span>) }</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> fetch var { <span class="dt">Fetch</span> <span class="op">$</span><span class="dv">2</span> <span class="dt">Nothing</span> }</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> update var val { <span class="dt">Update</span> <span class="op">$</span><span class="dv">2</span> <span class="op">$</span><span class="dv">3</span> }</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> <span class="kw">do</span> <span class="ch">&#39;{&#39;</span> <span class="fu">exp</span> <span class="ch">&#39;}&#39;</span> { <span class="dt">SExp</span> <span class="op">$</span><span class="dv">3</span> }</span></code></pre></div>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-bnf-cont.-1">GRIN BNF cont.</h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>val</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">:</span> <span class="ch">&#39;(&#39;</span> tag many(val) <span class="ch">&#39;)&#39;</span> { <span class="dt">Node</span> <span class="op">$</span><span class="dv">2</span> <span class="op">$</span><span class="dv">3</span> }</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> &#39;()&#39; { <span class="dt">Unit</span> }</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> lit { <span class="dt">VLit</span> <span class="op">$</span><span class="dv">1</span> }</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> var { <span class="dt">Var</span> <span class="op">$</span><span class="dv">1</span> }</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>lit</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="op">:</span> int    { <span class="dt">LitInt</span> <span class="op">$</span><span class="dv">1</span> }</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> string { <span class="dt">LitString</span> <span class="op">$</span><span class="dv">1</span> }</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> double { <span class="dt">LitDouble</span> <span class="op">$</span><span class="dv">1</span> }</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> bool   { <span class="dt">LitBool</span> <span class="op">$</span><span class="dv">1</span> }</span></code></pre></div>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-ast-1">GRIN AST</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- | SSA, first-order, strict, monadic, graph-reduction IR.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Grin</span> <span class="ot">=</span> <span class="dt">Grin</span> [ <span class="dt">Def</span> ]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> (<span class="dt">Eq</span>, <span class="dt">Show</span>, <span class="dt">Data</span>, <span class="dt">Typeable</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- | Top-level function definition in GRIN</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- main = pure 1 ~ Def &quot;main&quot; [] (Op (Pure (Lit 1)))</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- All Grin programs must have a main to execute</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Def</span> <span class="ot">=</span> <span class="dt">Def</span> <span class="dt">VarName</span> [<span class="dt">VarName</span>] <span class="dt">Exp</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> (<span class="dt">Eq</span>, <span class="dt">Show</span>, <span class="dt">Data</span>, <span class="dt">Typeable</span>)</span></code></pre></div>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-ast-2">GRIN AST</h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Exp</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=</span> <span class="dt">Bind</span> <span class="dt">LPat</span> <span class="dt">SExp</span> <span class="dt">Exp</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ Bind a value to a name, sequence computation</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ do { a &lt;- pure 1; () &lt;- store a; pure () }</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Bind (Pure (LitInt 1</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Case</span> <span class="dt">Val</span> [<span class="dt">CasePat</span>]</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ Case expression for forking control flow</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ case x of { 1 -&gt; 2; }</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Op</span> <span class="dt">SExp</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ Mutually-recursive on SExp</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> (<span class="dt">Eq</span>, <span class="dt">Show</span>, <span class="dt">Data</span>, <span class="dt">Typeable</span>, <span class="dt">Generic</span>)</span></code></pre></div>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-ast-3">GRIN AST</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- | GRIN core operations (fetch, store, update) modify the heap.</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">SExp</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=</span> <span class="dt">App</span> <span class="dt">VarName</span> [<span class="dt">Val</span>]</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- f (1,2) ~ App &quot;f&quot; [Lit 1, Lit 2]</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Pure</span> <span class="dt">Val</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ Returns value</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Store</span> <span class="dt">Val</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ Stores value on the heap</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Fetch</span> <span class="dt">VarName</span> (<span class="dt">Maybe</span> <span class="dt">Int</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ Fetch value from the heap, optionally indexed</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- fetch a[0] ~ Fetch &quot;a&quot; (Just 0)</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Update</span> <span class="dt">VarName</span> <span class="dt">Val</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ Update variable in-place on the heap</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- update a 2 ~ Update &quot;a&quot; (Lit (Lit 2))</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">SExp</span> <span class="dt">Exp</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ Mutually recursive on Exp</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> (<span class="dt">Eq</span>, <span class="dt">Show</span>, <span class="dt">Data</span>, <span class="dt">Typeable</span>)</span></code></pre></div>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-ast-4">GRIN AST</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- | Constant patterns</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">CPat</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=</span> <span class="dt">NodePat</span> <span class="dt">Tag</span> [<span class="dt">VarName</span>]</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ Constructor node pattern</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ \(Foo a b c) ~ CNodePat &quot;Foo&quot; [&quot;a&quot;,&quot;b&quot;,&quot;c&quot;]</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">LitPat</span> <span class="dt">Lit</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ Constant literal pattern</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ 1 ~ CLit 1</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">WildcardPat</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ Matches on any wildcard pattern</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> (<span class="dt">Eq</span>, <span class="dt">Show</span>, <span class="dt">Data</span>, <span class="dt">Typeable</span>)</span></code></pre></div>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-ast-5">GRIN AST</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Val</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=</span> <span class="dt">Node</span> <span class="dt">Tag</span> [<span class="dt">Val</span>]</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ (Foo a b c) ~ Node &quot;Foo&quot; [Var &quot;a&quot;, Var &quot;b&quot;]</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Unit</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ (), empty / void</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">VLit</span> <span class="dt">Lit</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ Literal</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">Var</span> <span class="dt">VarName</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- ^ Variable</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> (<span class="dt">Eq</span>, <span class="dt">Show</span>, <span class="dt">Data</span>, <span class="dt">Typeable</span>)</span></code></pre></div>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-ast-6">GRIN AST</h3>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- | GRIN literals go here</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Lit</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="ot">=</span> <span class="dt">LitInt</span> <span class="dt">Int</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">LitDouble</span> <span class="dt">Double</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">LitString</span> <span class="dt">Text</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="dt">LitBool</span> <span class="dt">Bool</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">deriving</span> (<span class="dt">Eq</span>, <span class="dt">Show</span>, <span class="dt">Data</span>, <span class="dt">Typeable</span>)</span></code></pre></div>
+</section>
+<section class="slide level1">
+
+<h3 id="another-example-1">Another example</h3>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>                       f <span class="ot">=</span> \x <span class="ot">-&gt;</span> x <span class="op">+</span> x</span></code></pre></div>
+<p><img data-src="https://user-images.githubusercontent.com/875324/138079286-ada04e78-c8c5-4429-ae26-14c792aeae77.png" /></p>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-translation">GRIN Translation</h3>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  m1 <span class="ot">&lt;-</span> store (<span class="dt">CInt</span> <span class="dv">5</span>);</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  m2 <span class="ot">&lt;-</span> store (<span class="dt">CInt</span> <span class="dv">2</span>);</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  m3 <span class="ot">&lt;-</span> store (<span class="dt">Fsub</span> m1 m2);</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  m4 <span class="ot">&lt;-</span> store (<span class="dt">Ff</span> m3);</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  (<span class="dt">CInt</span> result) <span class="ot">&lt;-</span> eval m4;</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> result;</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>sub s1 s2 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  (<span class="dt">CInt</span> s3) <span class="ot">&lt;-</span> eval s1;</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  (<span class="dt">CInt</span> s4) <span class="ot">&lt;-</span> eval s2;</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  s5 <span class="ot">&lt;-</span> _prim_int_sub s3 s4;</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> (<span class="dt">CInt</span> s5);</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>f f1 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  (<span class="dt">CInt</span> f2) <span class="ot">&lt;-</span> eval f1;</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  f3 <span class="ot">&lt;-</span> _prim_int_add f2 f2;</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> (<span class="dt">CInt</span> f3);</span></code></pre></div>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-translation-1">GRIN Translation</h3>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>eval e1 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  e2 <span class="ot">&lt;-</span> fetch e1;</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">case</span> e2 <span class="kw">of</span> {</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">CInt</span> e3) <span class="ot">-&gt;</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pure</span> e2;</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">Fsub</span> e4 e5) <span class="ot">-&gt;</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>      e6 <span class="ot">&lt;-</span> sub e4 e5;</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>      () <span class="ot">&lt;-</span> update e1 e6;</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pure</span> e6;</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">Ff</span> e7) <span class="ot">-&gt;</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>      e8 <span class="ot">&lt;-</span> f e7;</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>      () <span class="ot">&lt;-</span> update e1 e8;</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pure</span> e8;</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  }</span></code></pre></div>
+</section>
+<section class="slide level1">
+
+<h3 id="demo">Demo</h3>
+<p>Interpret the GRIN</p>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-benefits">GRIN benefits</h3>
+<ul>
+<li>No unknown control flow
+<ul>
+<li>GHC hardcodes <code>eval</code> in the RTS.</li>
+</ul></li>
+<li>Inlining is the gateway to all optimizations
+<ul>
+<li>Secrets of the GHC inliner</li>
+<li>GRIN inlines the <code>eval</code> function</li>
+</ul></li>
+<li>Inlining eval has the effect of removing the overhead of laziness</li>
+<li>Inlining eval opens up a world of additional optimizations only strict languages can use</li>
+</ul>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-goals">GRIN Goals</h3>
+<ul>
+<li>Remove as many <code>fetch</code>, <code>update</code>, <code>store</code> calls as possible
+<ul>
+<li>Removes allocations, improves performance</li>
+</ul></li>
+<li>Inline as much of the RTS into the user’s application as possible</li>
+<li>Deforestation for free</li>
+<li>Smaller binaries</li>
+<li>Very fast code</li>
+</ul>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-goals-1">GRIN Goals</h3>
+<p><img data-src="https://user-images.githubusercontent.com/875324/138152959-25d048a6-5ec5-41cf-9bd1-af676f14ee34.png" /></p>
+</section>
+<section class="slide level1">
+
+<h3 id="history-1">History</h3>
+<ul>
+<li>Created by Thomas Johnsson</li>
+<li>Documented only in Boquist Thesis</li>
+</ul>
+</section>
+<section class="slide level1">
+
+<h3 id="history-2">History</h3>
+<p><img data-src="https://user-images.githubusercontent.com/875324/138149363-bdb2e149-3af0-4552-93d2-776781fb542a.png" /></p>
+</section>
+<section class="slide level1">
+
+<h3 id="another-example-2">Another example</h3>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">sum</span> (upto <span class="dv">1</span> <span class="dv">10</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>upto m n <span class="ot">=</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">if</span> m <span class="op">&gt;</span> n</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">then</span> []</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">else</span> m <span class="op">:</span> upto (m<span class="op">+</span><span class="dv">1</span>) n</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span> l <span class="ot">=</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">case</span> l <span class="kw">of</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    [] <span class="ot">-&gt;</span> <span class="dv">0</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    (x<span class="op">:</span>xs) <span class="ot">-&gt;</span> x <span class="op">+</span> <span class="fu">sum</span> xs</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="co">-- &gt; main</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co">-- 55</span></span></code></pre></div>
+</section>
+<section class="slide level1">
+
+<h3 id="grin-translation-2">Grin translation</h3>
+<p><img width="400" src="https://user-images.githubusercontent.com/875324/138148673-b28087c5-5206-4e65-b7ab-d9fb665aab0c.png" /></p>
+</section>
+<section class="slide level1">
+
+<h3 id="static-analysis">Static Analysis</h3>
+<p><img data-src="https://user-images.githubusercontent.com/875324/138145652-e60b8c7e-bd8c-400c-bb14-348df23bf5d1.png" /></p>
+</section>
+<section class="slide level1">
+
+<h3 id="static-analysis-1">Static analysis</h3>
+<p><img data-src="https://user-images.githubusercontent.com/875324/138149082-ce04c7f1-ee17-4218-a3bb-5e7ae897000f.png" /></p>
+</section>
+<section class="slide level1">
+
+<h3 id="static-analysis-2">Static analysis</h3>
+<ul>
+<li>Inlining eval should be done intelligently
+<ul>
+<li>Can’t just inline the entire <code>eval</code> function everywhere</li>
+</ul></li>
+<li>Precise pointer analysis
+<ul>
+<li>Computationally intractable (NP-hard problem)</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level1">
+
+<h3 id="static-analysis-3">Static analysis</h3>
+<p><img data-src="https://user-images.githubusercontent.com/875324/138162604-ffe46665-8f2d-485d-925f-9eea941867fe.png" /></p>
+</section>
+<section class="slide level1">
+
+<h3 id="pointer-analysis-algorithms">Pointer analysis algorithms</h3>
+<ul>
+<li>Steensgaard O(n)
+<ul>
+<li>trades precision for speed</li>
+</ul></li>
+<li>Andereson O(n^3)
+<ul>
+<li>trades speed for precision</li>
+</ul></li>
+<li>Shapiro
+<ul>
+<li>configurable implementation</li>
+<li>O(n) - O(n^3)</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level1">
+
+<h3 id="steengaard">Steengaard</h3>
+<p><img data-src="https://user-images.githubusercontent.com/875324/138157393-ba11f012-55b4-4e34-aa1e-8357c1192580.png" /></p>
+</section>
+<section class="slide level1">
+
+<h3 id="static-analysis-result">Static analysis result</h3>
+<p><img data-src="https://user-images.githubusercontent.com/875324/138142439-50c77fc0-9ea3-470a-9d53-1aadf9ad738f.png" /></p>
+</section>
+<section class="slide level1">
+
+<h3 id="pointer-analysis-tools">Pointer analysis tools</h3>
+<ul>
+<li><a href="https://souffle-lang.github.io/">Souffle</a> datalog</li>
+</ul>
+</section>
+<section class="slide level1">
+
+<h3 id="type-system">Type system</h3>
+<ul>
+<li>GRIN does not have a type system by default</li>
+<li>Can infer types using the static analysis result</li>
+</ul>
+</section>
+<section class="slide level1">
+
+<h3 id="type-inference-via-static-analysis">Type inference via static analysis</h3>
+<p><img data-src="https://user-images.githubusercontent.com/875324/138159719-a3e55720-64c9-48c6-ba7a-fc71ea38f0d2.png" /></p>
+</section>
+<section class="slide level1">
+
+<h3 id="eval-inlining-example">Eval inlining example</h3>
+</section>
+<section id="optimizations" class="slide level1">
+<h1>Optimizations</h1>
+<ul>
+<li>Local code transformations
+<ul>
+<li>Evaluated Case Elimination</li>
+<li>Trivial Case Elimination</li>
+<li>Update Elimination</li>
+<li>Copy Propagation</li>
+<li>Constant Propagation</li>
+<li>Dead Procedure Elimination</li>
+<li>Dead Parameter Elimination</li>
+<li>Case Copy Propagation</li>
+</ul></li>
+</ul>
+</section>
+<section id="optimizations-1" class="slide level1">
+<h1>Optimizations</h1>
+<ul>
+<li>Whole program analysis based transformations
+<ul>
+<li>Sparse Case Optimisation</li>
+<li>Dead Variable Elimination</li>
+<li>Dead Data Elimination</li>
+<li>Common Subexpression Elimination</li>
+<li>Case Hoisting</li>
+<li>Generalized Unboxing</li>
+<li>Arity Raising</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level1">
+
+<h3 id="optimization-example">Optimization example</h3>
+<p><img data-src="https://github.com/grin-compiler/grin/raw/master/images/evaluated-case-elimination.png" /></p>
+</section>
+<section class="slide level1">
+
+<h3 id="optimization-example-1">Optimization example</h3>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ot">evaluatedCaseElimination ::</span> <span class="dt">Grin</span> <span class="ot">-&gt;</span> <span class="dt">Grin</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>evaluatedCaseElimination <span class="ot">=</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  transformOn (defs <span class="op">.</span> each <span class="op">.</span> expr) <span class="op">$</span> \expr&#39; <span class="ot">-&gt;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>     <span class="kw">case</span> expr&#39; <span class="kw">of</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>       <span class="dt">Case</span> val pats</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>         <span class="op">|</span> <span class="fu">all</span> (casesReturnSameValue val) pats <span class="ot">-&gt;</span> <span class="dt">Op</span> (<span class="dt">Pure</span> val)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>         <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">-&gt;</span> expr&#39;</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>       _ <span class="ot">-&gt;</span> expr&#39;</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>     <span class="kw">where</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>       casesReturnSameValue</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="ot">         ::</span> <span class="dt">Val</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>         <span class="ot">-&gt;</span> <span class="dt">CasePat</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>         <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>       casesReturnSameValue val (_, ex) <span class="ot">=</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>         ex <span class="op">==</span> <span class="dt">Op</span> (<span class="dt">Pure</span> val)</span></code></pre></div>
+</section>
+<section class="slide level1">
+
+<h3 id="optimized-grin">Optimized GRIN</h3>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>  main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span> <span class="dv">0</span> <span class="dv">1</span> <span class="dv">1000</span>;</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span> n29 n30 n31 <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    b2 <span class="ot">&lt;-</span> _prim_int_gt n30 n31;</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">case</span> b2 <span class="kw">of</span> {</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">True</span> <span class="ot">-&gt;</span> <span class="fu">pure</span> n29;</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">False</span> <span class="ot">-&gt;</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>        n18 <span class="ot">&lt;-</span> _prim_int_add n30 <span class="dv">1</span>;</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>        n28 <span class="ot">&lt;-</span> _prim_int_add n29 n30;</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sum</span> n28 n18 n31;</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div>
+</section>
+<section class="slide level1">
+
+<h3 id="who-uses-grin">Who uses GRIN?</h3>
+<ul>
+<li><a href="https://github.com/Lemmih/lhc">LHC (Luxurious Haskell Compiler)</a></li>
+<li><a href="http://repetae.net/computer/jhc/">JHC (“John Meachem” Haskell Compiler)</a></li>
+<li><a href="https://github.com/grin-compiler/grin">GRIN compiler project</a></li>
+</ul>
+</section>
+<section class="slide level1">
+
+<h3 id="why-study-grin">Why study GRIN?</h3>
+<ul>
+<li>Understand how functional programs are evaluated</li>
+<li>Exposure to many optimizations that are similar at the GHC core level</li>
+<li>Exposure to many packages that GHC itself uses (<code>alex</code>, <code>happy</code>)</li>
+</ul>
+</section>
+<section class="slide level1">
+
+<h3 id="further-study">Further study</h3>
+<p><a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.27.3918&amp;rep=rep1&amp;type=pdf">A highly optimizing backend for lazy functional languages</a></p>
+</section>
+<section class="slide level1">
+
+<h3 id="future-work">Future work</h3>
+<ul>
+<li>Garbage Collection</li>
+<li>Exceptions</li>
+<li>HOFs</li>
+<li>LLVM Codegen</li>
+<li>Lambda calculus translation</li>
+<li>Additional optimizations</li>
+</ul>
+</section>
+<section class="slide level1">
+
+<h3 id="thanks">Thanks!</h3>
+<p><img data-src="https://upload.wikimedia.org/wikipedia/commons/b/bc/Face-grin.svg" /></p>
+</section>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/reveal.js@^4//dist/reveal.js"></script>
+
+  <!-- reveal.js plugins -->
+  <script src="https://unpkg.com/reveal.js@^4//plugin/notes/notes.js"></script>
+  <script src="https://unpkg.com/reveal.js@^4//plugin/search/search.js"></script>
+  <script src="https://unpkg.com/reveal.js@^4//plugin/zoom/zoom.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: true,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'bottom-right',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: false,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: false,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'default',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: true,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'slide',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'fade',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // reveal.js plugins
+        plugins: [
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    </body>
+</html>
